@@ -1,0 +1,122 @@
+@startuml red_nueva
+skinparam backgroundColor #ffffff
+skinparam shadowing false
+
+skinparam node {
+  BackgroundColor #f7f7f7
+  BorderColor #555555
+}
+skinparam cloud {
+  BackgroundColor #eef6ff
+  BorderColor #356ac3
+}
+skinparam rectangle {
+  BackgroundColor #fefefe
+  BorderColor #888
+}
+
+skinparam node<<Gateway>> {
+  BackgroundColor #e8f0fe
+  BorderColor #1a73e8
+}
+
+skinparam node<<MainRouting>> {
+  BackgroundColor #ffdd009b
+  BorderColor #bda400ff
+}
+
+skinparam node<<AP>> {
+  BackgroundColor #019f0e44
+  BorderColor #009c0dFF
+}
+
+title Red del Colegio Propuesta
+
+cloud "Internet\n200 Mbps simétricos" as inet
+
+node "Switch" as sw
+
+node "App Server" as app_srv
+
+node "Mikrotik" as sw_inet <<MainRouting>>
+
+node "Primer ciclo" as primer_ciclo
+
+node "Switch Lab 1 (Prog)" as lab1_prog
+
+node "Mikrotik WiFi" as mt_lab1_prog <<Gateway>>
+
+node "Mikrotik WiFi" as mt_lab2_electronica <<Gateway>>
+
+node "Mikrotik WiFi" as mt_lab1_electronica <<Gateway>>
+
+node "Switch Lab 2 (Electronica)" as lab2_electronica
+
+node "Switch Lab 1 (Electronica)" as lab1_electronica
+
+node "Switch Lab 2 (Prog)" as lab2_prog
+
+node "Switch Lab FAT (Prog)" as lab_fat_prog
+
+node "Switch Lab Redes (Prog)" as lab_redes_prog
+
+node "Mikrotik WiFi" as mt_lab2_prog <<Gateway>>
+
+node "Mikrotik WiFi" as mt_fat_prog  <<Gateway>>
+
+node "Mikrotik" as mt_redes_prog <<Gateway>>
+
+node "Switch Lab 3 (Prog)" as lab3_prog
+
+node "Switch Ajuste" as lab_ajuste
+
+node "Mikrotik WiFi" as mt_lab3_prog <<Gateway>>
+
+node "Switch Admin" as sw_admin
+
+node "Switch WiFi" as wifi
+
+node "Comunidad" as comunidad
+
+node "Mikrotik WiFi" as mt_admin <<Gateway>>
+
+node "Mikrotik" as mt_ajuste <<Gateway>>
+
+node "Antenas 1er Piso" as ant_1p <<AP>>
+
+node "Antenas 2do Piso" as ant_2p <<AP>>
+
+node "Antenas Taller" as ant_taller <<AP>>
+
+inet -d-> sw
+sw -d-> app_srv
+sw -d-> sw_inet
+sw -d-> primer_ciclo
+
+sw_inet -d-> mt_lab2_prog
+sw_inet -d-> mt_fat_prog
+sw_inet -d-> mt_lab3_prog
+sw_inet -d-> mt_admin
+sw_inet -d-> mt_redes_prog
+sw_inet -d-> wifi
+sw_inet -d-> mt_lab1_prog
+sw_inet -d-> mt_lab2_electronica
+sw_inet -d-> mt_lab1_electronica
+sw_inet -d-> mt_ajuste
+
+mt_lab1_electronica -d-> lab1_electronica
+mt_lab1_prog -d-> lab1_prog
+mt_lab2_electronica -d-> lab2_electronica
+mt_fat_prog -d-> lab_fat_prog
+mt_lab2_prog -d-> lab2_prog
+mt_redes_prog -d-> lab_redes_prog
+mt_lab3_prog -d-> lab3_prog
+mt_ajuste -d-> lab_ajuste
+mt_admin -d-> sw_admin
+
+lab2_prog -d-> comunidad
+
+wifi -d-> ant_1p
+wifi -d-> ant_2p
+wifi -d-> ant_taller
+@enduml

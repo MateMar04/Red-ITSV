@@ -1,0 +1,145 @@
+@startuml
+skinparam backgroundColor #ffffff
+skinparam shadowing false
+
+
+skinparam node {
+  BackgroundColor #f7f7f7
+  BorderColor #555555
+}
+skinparam cloud {
+  BackgroundColor #eef6ff
+  BorderColor #356ac3
+}
+skinparam rectangle {
+  BackgroundColor #fefefe
+  BorderColor #888
+}
+
+skinparam node<<Gateway>> {
+  BackgroundColor #e8f0fe
+  BorderColor #1a73e8
+}
+
+skinparam node<<MainRouting>> {
+  BackgroundColor #ffdd009b
+  BorderColor #1967d2
+}
+
+title Red del Colegio Actual
+
+cloud "Internet\n200 Mbps simétricos" as inet
+
+node "Switch" as sw
+
+node "App Server" as app_srv
+
+node "Switch Internet" as sw_inet <<MainRouting>>
+
+node "Pan Casero" as pan_casero <<MainRouting>>
+
+node "Primer ciclo" as primer_ciclo
+
+node "Switch" as sw_lab1_prog
+
+node "Switch Lab 1 (Prog)" as lab1_prog
+
+node "PC DHCP" as pc_dhcp_lab_1 <<Gateway>>
+
+node "Computadoras del lab" as comp_lab_1
+
+node "Router" as router_lab2_electronica <<Gateway>>
+
+node "Switch Lab 2 (Electronica)" as lab2_electronica
+
+node "Switch Lab 2 Profes (Electronica)" as lab2_electronica_profes
+
+node "Switch Lab 1 Alumnos (Electronica)" as lab1_electronica_alumnos
+
+node "Switch Lab 1 Profes (Electronica)" as lab1_electronica_profes
+
+node "Computadoras Lab 2" as comp_lab_2_electronica
+
+node "Computadoras Lab 1" as comp_lab_1_electronica
+
+node "Computadoras de Profes Lab 1" as comp_lab_1_electronica_profes
+
+node "Computadoras de Profes Lab 2" as comp_lab_2_electronica_profes
+
+node "Switch Lab 2 (Prog)" as lab2_prog
+
+node "Switch Lab FAT (Prog)" as lab_fat_prog
+
+node "Switch Lab Redes (Prog)" as lab_redes_prog
+
+node "Mikrotik" as mt_lab2_prog <<Gateway>>
+
+node "Mikrotik" as mt_fat_prog  <<Gateway>>
+
+node "PC DHCP" as pc_dhcp_lab_redes <<Gateway>>
+
+node "Switch Soldadura" as sw_soldadura
+
+node "Electricidad" as electricidad
+
+node "Switch Lab 3 (Prog)" as lab3_prog
+
+node "Lab Ajuste" as lab_ajuste
+
+node "Switch" as sw_taller
+
+node "PC DHCP" as pc_dhcp_lab_3 <<Gateway>>
+
+node "Switch Admin" as sw_admin
+
+node "Wifi" as wifi
+
+node "Comunidad" as comunidad
+
+node "Mikrotik" as mt_admin <<Gateway>>
+
+inet -d-> sw
+sw -d-> app_srv
+sw -d-> pan_casero
+sw -d-> primer_ciclo
+
+pan_casero -d-> sw_inet
+
+sw_inet -d-> sw_lab1_prog
+sw_inet -d-> mt_lab2_prog
+sw_inet -d-> mt_fat_prog
+sw_inet -d-> pc_dhcp_lab_3
+sw_inet -d-> mt_admin
+sw_inet -d-> pc_dhcp_lab_redes
+sw_inet -d-> wifi
+
+sw_lab1_prog -d-> router_lab2_electronica
+sw_lab1_prog -d-> pc_dhcp_lab_1
+pc_dhcp_lab_1 -d-> lab1_prog
+lab1_prog -d-> comp_lab_1
+
+lab2_electronica -d-> lab1_electronica_alumnos
+lab2_electronica -d-> lab1_electronica_profes
+lab2_electronica -d-> lab2_electronica_profes
+lab2_electronica -d-> comp_lab_2_electronica
+lab1_electronica_alumnos -d-> comp_lab_1_electronica
+lab1_electronica_profes -d-> comp_lab_1_electronica_profes
+lab2_electronica_profes -d-> comp_lab_2_electronica_profes
+lab2_electronica -d-> sw_soldadura
+lab2_electronica -d-> electricidad
+router_lab2_electronica -d-> lab2_electronica
+
+mt_fat_prog -d-> lab_fat_prog
+
+mt_lab2_prog -d-> lab2_prog
+lab2_prog -d-> comunidad
+
+pc_dhcp_lab_redes -d-> lab_redes_prog
+
+pc_dhcp_lab_3 -d-> lab3_prog
+lab3_prog -d-> sw_taller
+
+sw_taller -d-> lab_ajuste
+
+mt_admin -d-> sw_admin
+@enduml

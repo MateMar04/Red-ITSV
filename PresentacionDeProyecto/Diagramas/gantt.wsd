@@ -1,0 +1,22 @@
+@startgantt Plan de Actualizacion de Red
+Project starts 2025-09-09
+[Estudio de Topología Actual] starts 2025-09-09 and lasts 5 days
+[Analisis de Cuellos de Botella] starts 2025-09-15 and lasts 3 days
+[Modificacion de Reglas de Servidor] starts 2025-09-18 and lasts 1 day
+[Investigacion de Nuevas Tecnologias] starts 2025-09-22 and lasts 2 days
+[Planeamiento de Nueva Topologia] starts 2025-09-24 and lasts 2 days
+[Presentacion de Proyecto] starts 2025-09-29 and lasts 1 day
+[Compra de materiales] starts 2025-10-01 and lasts 3 weeks
+[Fase 1] starts 2025-11-03 and lasts 4 days
+[Configuracion de Router] starts 2025-11-03 and lasts 3 days
+[Cambio de Equipo] starts 2025-11-06 and lasts 1 day
+[Fase 2] starts 2025-11-10 and lasts 26 days
+[Configuracion de AP en lab FAT] starts 2025-11-10 and lasts 1 day
+[Normalizacion de lab de Redes] starts 2025-11-11 and lasts 3 days
+[Documentacion de lab Redes] starts 2025-11-14 and lasts 1 day
+[Normalizacion de lab Fat] starts 2025-11-17 and lasts 3 days
+[Documentacion de lab Fat] starts 2025-11-20 and lasts 1 day
+[Relevamiento General] starts 2025-11-21 and lasts 1 days
+[Posible reemplazo de equipos] starts 2025-11-24 and lasts 5 days
+[Pruebas de Funcionamiento] starts 2025-12-01 and lasts 5 days
+@endgantt
