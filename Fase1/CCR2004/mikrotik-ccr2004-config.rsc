@@ -3,92 +3,70 @@
 # Revise cada seccion y adapte nombres de interfaces fisicas segun su cableado.
 
 /system identity set name="panca.itsv.edu.ar"
-/system clock set time-zone-name=Europe/Rome
-/system ntp client set enabled=yes mode=unicast server-dns-names=0.pool.ntp.org,1.pool.ntp.org,2.pool.ntp.org,3.pool.ntp.org
+/system clock set time-zone-name=America/Buenos_Aires
+/system ntp client set enabled=yes mode=unicast
 
-/interface bridge
-add name=bridge-lan comment="LAN principal (ZeroShell ETH01)" protocol-mode=rstp
-add name=loopback-ovpn comment="Loopback OpenVPN (ZeroShell VPN99)" protocol-mode=none
+/interface bridge add name=bridge-lan comment="LAN Principal" protocol-mode=rstp
 
-/interface bridge port
-add bridge=bridge-lan interface=ether2 comment="LAN uplink (ajuste segun puertos usados)"
+/interface bridge port add bridge=bridge-lan interface=ether2
+/interface bridge port add bridge=bridge-lan interface=ether3
+/interface bridge port add bridge=bridge-lan interface=ether4
+/interface bridge port add bridge=bridge-lan interface=ether5
+/interface bridge port add bridge=bridge-lan interface=ether6
+/interface bridge port add bridge=bridge-lan interface=ether7
+/interface bridge port add bridge=bridge-lan interface=ether8
+/interface bridge port add bridge=bridge-lan interface=ether9
+/interface bridge port add bridge=bridge-lan interface=ether10
+/interface bridge port add bridge=bridge-lan interface=ether11
+/interface bridge port add bridge=bridge-lan interface=ether12
 
-/interface list
-add name=WAN comment="Enlace saliente (ZeroShell ETH00)"
-add name=LAN comment="Redes internas (LAN + VPN)"
+/interface list add name=WAN comment="Enlace saliente"
+/interface list add name=LAN comment="Redes internas"
 
-/interface list member
-add interface=ether1 list=WAN comment="ISP - 181.10.31.114/29"
-add interface=bridge-lan list=LAN
-add interface=loopback-ovpn list=LAN
+/interface list member add interface=ether1 list=WAN comment="ISP - 181.10.31.114/29"
+/interface list member add interface=bridge-lan list=LAN
 
-/ip address
-add address=181.10.31.114/29 interface=ether1 comment="WAN - ZeroShell ETH00"
-add address=192.168.0.1/24 interface=bridge-lan comment="LAN - ZeroShell ETH01"
-add address=192.168.250.254/24 interface=loopback-ovpn comment="Gateway VPN - ZeroShell VPN99"
+/ip address add address=181.10.31.114/29 interface=ether1 comment="WAN"
+/ip address add address=192.168.0.1/24 interface=bridge-lan comment="LAN"
 
-/ip route
-add dst-address=0.0.0.0/0 gateway=181.10.31.113 distance=1 comment="Default route - ZeroShell"
+/ip route add dst-address=0.0.0.0/0 gateway=181.10.31.113 distance=1 comment="Default route"
 
-/ip dns
-set allow-remote-requests=yes cache-size=4096KiB servers=1.1.1.1
-/ip dns static
-add name="virtual.itsv.edu.ar" type=FWD forward-to=192.168.0.70 match-subdomain=yes ttl=1d comment="Redireccion especifica como en ZeroShell"
+/ip dns set allow-remote-requests=yes cache-size=4096KiB servers=1.1.1.1
+/ip dns static add name="virtual.itsv.edu.ar" type=FWD forward-to=192.168.0.70 match-subdomain=yes ttl=1d comment="Redireccion especifica como en ZeroShell"
 
-/ip firewall address-list
-add list=internal-networks address=192.168.0.0/24 comment="LAN"
-add list=internal-networks address=192.168.250.0/24 comment="Clientes OpenVPN"
+/ip firewall address-list add list=internal-networks address=192.168.0.0/24 comment="LAN"
 
-/ip firewall nat
-add chain=srcnat action=masquerade out-interface-list=WAN src-address-list=internal-networks comment="NAT interno hacia WAN"
+/ip firewall nat add chain=srcnat action=masquerade out-interface-list=WAN src-address-list=internal-networks comment="NAT interno hacia WAN"
 
-/ip firewall filter
-add chain=input action=accept connection-state=established,related comment="Entrada established/related"
-add chain=input action=drop connection-state=invalid comment="Entrada invalid"
-add chain=input action=accept in-interface-list=LAN comment="Gestion desde redes internas"
-add chain=input action=accept in-interface-list=WAN protocol=tcp dst-port=1194 comment="OpenVPN TCP 1194 (servidor inicialmente deshabilitado)"
-add chain=input action=drop in-interface-list=WAN comment="Bloqueo de acceso directo desde WAN"
-add chain=forward action=accept connection-state=established,related comment="Forward established/related"
-add chain=forward action=drop connection-state=invalid comment="Forward invalid"
-add chain=forward action=accept in-interface-list=LAN out-interface-list=WAN comment="LAN a WAN"
-add chain=forward action=accept src-address-list=internal-networks out-interface-list=WAN comment="VPN a WAN"
-add chain=forward action=drop in-interface-list=WAN connection-state=new comment="Bloqueo conexiones entrantes no solicitadas"
+/ip firewall filter add chain=input action=accept connection-state=established,related comment="Entrada established/related"
+/ip firewall filter add chain=input action=drop connection-state=invalid comment="Entrada invalid"
+/ip firewall filter add chain=input action=accept in-interface-list=LAN comment="Gestion desde redes internas"
+/ip firewall filter add chain=input action=drop in-interface-list=WAN comment="Bloqueo de acceso directo desde WAN"
+/ip firewall filter add chain=forward action=accept connection-state=established,related comment="Forward established/related"
+/ip firewall filter add chain=forward action=drop connection-state=invalid comment="Forward invalid"
+/ip firewall filter add chain=forward action=accept in-interface-list=LAN out-interface-list=WAN comment="LAN a WAN"
+/ip firewall filter add chain=forward action=drop in-interface-list=WAN connection-state=new comment="Bloqueo conexiones entrantes no solicitadas"
 
-/ip service
-set [find name=telnet] disabled=yes
-set [find name=ftp] disabled=yes
-set [find name=www] disabled=yes
-set [find name=www-ssl] disabled=yes
-set [find name=api] disabled=yes
-set [find name=api-ssl] disabled=yes
-set [find name=ssh] port=22 strong-crypto=yes
-set [find name=winbox] address=192.168.0.0/24,192.168.250.0/24
+# === QoS replicado de ZeroShell ===
+/queue simple add name=QoS_TOTAL target=192.168.0.0/24 limit-at=200M/200M max-limit=1000M/1000M priority=1/1 queue=default/default comment="ETH01"
+/queue simple add name=QoS_RED4 parent=QoS_TOTAL target=192.168.0.4/32 limit-at=50M/50M max-limit=80M/80M priority=1/1 queue=default/default comment="Host 192.168.0.4 (Clase RED4)"
+/queue simple add name=QoS_ADMIN parent=QoS_TOTAL target=192.168.0.8/32 limit-at=50M/50M max-limit=90M/90M priority=1/1 queue=default/default comment="Administracion (Clase ADMIN)"
+/queue simple add name=QoS_LABREDES parent=QoS_TOTAL target=192.168.0.2/32 limit-at=100M/100M max-limit=150M/150M priority=2/2 queue=default/default comment="Laboratorio de Redes (Clase LABREDES)"
+/queue simple add name=QoS_LABPROG1 parent=QoS_TOTAL target=192.168.0.5/32 limit-at=80M/80M max-limit=150M/150M priority=2/2 queue=default/default comment="Laboratorio Prog 1 (Clase LABPROG1)"
+/queue simple add name=QoS_LABPROG2 parent=QoS_TOTAL target=192.168.0.6/32 limit-at=100M/100M max-limit=150M/150M priority=1/1 queue=default/default comment="Laboratorio Prog 2 (Clase LABPROG2)"
+/queue simple add name=QoS_LABPROG3 parent=QoS_TOTAL target=192.168.0.70/32 limit-at=50M/50M max-limit=80M/80M priority=2/2 queue=default/default comment="Laboratorio Prog 3 (Clase LABPROG3)"
+/queue simple add name=QoS_LABPROY parent=QoS_TOTAL target=192.168.0.3/32 limit-at=100M/100M max-limit=200M/200M priority=2/2 queue=default/default comment="Laboratorio Proyectos (Clase LABPROY)"
+/queue simple add name=QoS_LABSELECTR parent=QoS_TOTAL target=192.168.0.71/32 limit-at=50M/50M max-limit=100M/100M priority=2/2 queue=default/default comment="Laboratorio Electronica (Clase LABSELECTR)"
+/queue simple add name=QoS_LABSEM parent=QoS_TOTAL target=192.168.0.100/32 limit-at=50M/50M max-limit=80M/80M priority=3/3 queue=default/default comment="Laboratorio Electromecanica (Clase LABSEM)"
+/queue simple add name=QoS_WIFI parent=QoS_TOTAL target=192.168.0.7/32 limit-at=20M/20M max-limit=20M/20M priority=3/3 queue=default/default comment="Wifi Mikrotik (Clase WIFI)"
+/queue simple add name=QoS_DEFAULT parent=QoS_TOTAL target=192.168.0.0/24 limit-at=20M/20M max-limit=20M/20M priority=3/3 queue=default/default comment="Trafico no clasificado (Clase DEFAULT)"
 
-/system note
-set show-at-login=yes note="CCR2004 migrada desde ZeroShell. Revisar usuarios VPN y certificados antes de habilitar servicios."
+/ip service set [find name=telnet] disabled=yes
+/ip service set [find name=ftp] disabled=yes
+/ip service set [find name=www] disabled=yes
+/ip service set [find name=www-ssl] disabled=yes
+/ip service set [find name=api] disabled=yes
+/ip service set [find name=api-ssl] disabled=yes
+/ip service set [find name=winbox] address=192.168.0.0/24
 
-/ip pool
-add name=ovpn-pool ranges=192.168.250.1-192.168.250.253
-
-/ppp profile
-add name=ovpn-profile local-address=192.168.250.254 remote-address=ovpn-pool dns-server=192.168.250.254 use-encryption=required comment="Perfil OpenVPN equivalente a ZeroShell"
-
-/interface ovpn-server server
-set enabled=no port=1194 mode=ip netmask=24 protocol=tcp default-profile=ovpn-profile auth=sha1 cipher=aes256 require-client-certificate=yes keepalive-timeout=60
-
-# Cree usuarios VPN con /ppp secret add name="usuario" password="clave" profile=ovpn-profile service=ovpn
-# Importe los certificados desde Database/etc/ssl si desea habilitar OpenVPN con verificacion X.509.
-
-/system logging
-set 0 topics=info
-set 1 topics=error
-set 2 topics=warning
-add topics=firewall
-
-/tool mac-server mac-winbox
-set allowed-interface-list=LAN
-/tool mac-server
-set allowed-interface-list=none
-
-# Ajuste /interface bridge port para anadir mas puertos LAN (ether3-ether16, sfp-sfpplus1/2) si aplica.
-# Revise tambien los scripts maliciosos detectados en el backup antes de automatizar tareas en el nuevo router.
+/system note set show-at-login=yes note="CCR2004-16G-2S+"
