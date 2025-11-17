@@ -85,6 +85,8 @@ node "RED-ITSV AP*2" as red_itsv_p1 <<AP>>
 
 node "RED-ITSV AP*8" as red_itsv_pB <<AP>>
 
+node "RED-ITSV AP*8" as red_subsuelo <<AP>>
+
 node "Mikrotik WiFi" as mt_admin <<Gateway>>
 
 node "Mikrotik" as mt_ajuste <<Gateway>>
@@ -103,7 +105,6 @@ modem -d-> primer_ciclo
 
 sw_inet -d-> mt_lab2_prog
 sw_inet -d-> mt_fat_prog
-sw_inet -d-> mt_lab3_prog
 sw_inet -d-> mt_redes_prog
 sw_inet -d-> sw_piso1
 sw_inet -d-> sw_pisoPB
@@ -131,5 +132,6 @@ sw_pisoPB -d-> mt_admin
 
 sw_subsuelo -d-> mt_ajuste
 sw_subsuelo -d-> mt_lab3_prog
+sw_subsuelo -d-> red_subsuelo
 
 @enduml
