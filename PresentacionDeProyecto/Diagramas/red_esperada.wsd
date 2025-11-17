@@ -25,6 +25,11 @@ skinparam node<<MainRouting>> {
   BorderColor #bda400ff
 }
 
+skinparam node<<Switch>> {
+  BackgroundColor #fea546d3
+  BorderColor #d47006ff
+}
+
 skinparam node<<AP>> {
   BackgroundColor #019f0e44
   BorderColor #009c0dFF
@@ -34,21 +39,21 @@ title Red del Colegio Propuesta
 
 cloud "Internet\n200 Mbps simétricos" as inet
 
-node "Switch" as sw
+node "Modem" as modem
 
 node "App Server" as app_srv
 
-node "Mikrotik" as sw_inet <<MainRouting>>
+node "Mikrotik CCR2004-16G-2S+" as sw_inet <<MainRouting>>
 
 node "Primer ciclo" as primer_ciclo
 
 node "Switch Lab 1 (Prog)" as lab1_prog
 
-node "Mikrotik WiFi" as mt_lab1_prog <<Gateway>>
+node "Mikrotik LAB1 Prog" as mt_lab1_prog <<Gateway>>
 
-node "Mikrotik WiFi" as mt_lab2_electronica <<Gateway>>
+node "Mikrotik LAB2 Electronica" as mt_lab2_electronica <<Gateway>>
 
-node "Mikrotik WiFi" as mt_lab1_electronica <<Gateway>>
+node "Mikrotik LAB1 Electronica" as mt_lab1_electronica <<Gateway>>
 
 node "Switch Lab 2 (Electronica)" as lab2_electronica
 
@@ -60,11 +65,11 @@ node "Switch Lab FAT (Prog)" as lab_fat_prog
 
 node "Switch Lab Redes (Prog)" as lab_redes_prog
 
-node "Mikrotik WiFi" as mt_lab2_prog <<Gateway>>
+node "Mikrotik WiFi LAB2 Prog" as mt_lab2_prog <<Gateway>>
 
-node "Mikrotik WiFi" as mt_fat_prog  <<Gateway>>
+node "Mikrotik WiFi LAB FAT Prog" as mt_fat_prog  <<Gateway>>
 
-node "Mikrotik" as mt_redes_prog <<Gateway>>
+node "Mikrotik Redes Prog" as mt_redes_prog <<Gateway>>
 
 node "Switch Lab 3 (Prog)" as lab3_prog
 
@@ -74,39 +79,41 @@ node "Mikrotik WiFi" as mt_lab3_prog <<Gateway>>
 
 node "Switch Admin" as sw_admin
 
-node "Switch WiFi" as wifi
+node "RED-ITSV-COMUNIDAD AP*1" as comunidad <<AP>>
 
-node "Comunidad" as comunidad
+node "RED-ITSV AP*2" as red_itsv_p1 <<AP>>
+
+node "RED-ITSV AP*8" as red_itsv_pB <<AP>>
 
 node "Mikrotik WiFi" as mt_admin <<Gateway>>
 
 node "Mikrotik" as mt_ajuste <<Gateway>>
 
-node "Antenas 1er Piso" as ant_1p <<AP>>
+node "Switch Piso 1" as sw_piso1  <<Switch>>
 
-node "Antenas 2do Piso" as ant_2p <<AP>>
+node "Switch Planta Baja" as sw_pisoPB <<Switch>>
 
-node "Antenas Taller" as ant_taller <<AP>>
+node "Switch Subsuelo" as sw_subsuelo <<Switch>>
 
-inet -d-> sw
-sw -d-> app_srv
-sw -d-> sw_inet
-sw -d-> primer_ciclo
+
+inet -d-> modem
+modem -d-> app_srv
+modem -d-> sw_inet
+modem -d-> primer_ciclo
 
 sw_inet -d-> mt_lab2_prog
 sw_inet -d-> mt_fat_prog
 sw_inet -d-> mt_lab3_prog
-sw_inet -d-> mt_admin
 sw_inet -d-> mt_redes_prog
-sw_inet -d-> wifi
+sw_inet -d-> sw_piso1
+sw_inet -d-> sw_pisoPB
+sw_inet -d-> sw_subsuelo
 sw_inet -d-> mt_lab1_prog
-sw_inet -d-> mt_lab2_electronica
-sw_inet -d-> mt_lab1_electronica
-sw_inet -d-> mt_ajuste
 
-mt_lab1_electronica -d-> lab1_electronica
+
 mt_lab1_prog -d-> lab1_prog
 mt_lab2_electronica -d-> lab2_electronica
+mt_lab1_electronica -d-> lab1_electronica
 mt_fat_prog -d-> lab_fat_prog
 mt_lab2_prog -d-> lab2_prog
 mt_redes_prog -d-> lab_redes_prog
@@ -114,9 +121,15 @@ mt_lab3_prog -d-> lab3_prog
 mt_ajuste -d-> lab_ajuste
 mt_admin -d-> sw_admin
 
-lab2_prog -d-> comunidad
+sw_piso1 -d-> comunidad
+sw_piso1 -d-> mt_lab2_electronica
+sw_piso1 -d-> mt_lab1_electronica
+sw_piso1 -d-> red_itsv_p1
 
-wifi -d-> ant_1p
-wifi -d-> ant_2p
-wifi -d-> ant_taller
+sw_pisoPB -d-> red_itsv_pB
+sw_pisoPB -d-> mt_admin
+
+sw_subsuelo -d-> mt_ajuste
+sw_subsuelo -d-> mt_lab3_prog
+
 @enduml

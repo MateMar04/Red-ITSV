@@ -30,6 +30,8 @@ title Red del Colegio Actual
 
 cloud "Internet\n200 Mbps simétricos" as inet
 
+node "Modem" as modem
+
 node "Switch" as sw
 
 node "App Server" as app_srv
@@ -98,7 +100,8 @@ node "Comunidad" as comunidad
 
 node "Mikrotik" as mt_admin <<Gateway>>
 
-inet -d-> sw
+inet -d-> modem
+modem -d-> sw
 sw -d-> app_srv
 sw -d-> pan_casero
 sw -d-> primer_ciclo
