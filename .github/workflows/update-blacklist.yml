@@ -1,0 +1,43 @@
+name: Actualizar Blacklist DNS
+
+on:
+  schedule:
+    # Todos los dias a las 03:00 UTC (00:00 Argentina)
+    - cron: "0 3 * * *"
+  workflow_dispatch: # Permite ejecucion manual desde GitHub
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generar blacklist
+        run: python3 Fase1/CCR2004/generate-blacklist.py --output blacklist-dns.rsc
+
+      - name: Subir blacklist como Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Eliminar release anterior si existe
+          gh release delete latest-blacklist --yes --cleanup-tag 2>/dev/null || true
+
+          # Crear nueva release con el archivo
+          gh release create latest-blacklist \
+            blacklist-dns.rsc \
+            --title "Blacklist DNS - $(date -u +'%Y-%m-%d')" \
+            --notes "Blacklist generada automaticamente el $(date -u +'%Y-%m-%d %H:%M UTC').
+
+          Categorias incluidas: malware, phishing, cryptojacking, dangerous_material, violence, hacking, mixed_adult, gambling, dating, games, social_networks.
+
+          Fuente: https://github.com/olbat/ut1-blacklists" \
+            --latest
