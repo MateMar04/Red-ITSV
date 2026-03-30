@@ -59,11 +59,8 @@ move [find comment="Bloquear DoH a proveedores conocidos - anti-bypass"] \
 # -------------------------------------------------------
 /system script
 add name="update-blacklist" policy=read,write,test source={
-:local ghUser "MateMar04"
-:local ghRepo "Red-ITSV"
-:local ghTag "latest-blacklist"
+:local url "https://raw.githubusercontent.com/MateMar04/Red-ITSV/blacklist/blacklist-dns.rsc"
 :local filename "blacklist-dns.rsc"
-:local url "https://github.com/$ghUser/$ghRepo/releases/download/$ghTag/$filename"
 
 :log info "Blacklist: Iniciando descarga desde GitHub..."
 

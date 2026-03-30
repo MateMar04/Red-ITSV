@@ -24,20 +24,21 @@ jobs:
       - name: Generar blacklist
         run: python3 Fase1/CCR2004/generate-blacklist.py --max-domains 500000 --output blacklist-dns.rsc
 
-      - name: Subir blacklist como Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publicar en rama blacklist
         run: |
-          # Eliminar release anterior si existe
-          gh release delete latest-blacklist --yes --cleanup-tag 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Crear nueva release con el archivo
-          gh release create latest-blacklist \
-            blacklist-dns.rsc \
-            --title "Blacklist DNS - $(date -u +'%Y-%m-%d')" \
-            --notes "Blacklist generada automaticamente el $(date -u +'%Y-%m-%d %H:%M UTC').
+          # Crear rama huerfana (sin historial, evita que el repo crezca)
+          git checkout --orphan blacklist
+          git rm -rf . 2>/dev/null || true
+          git checkout HEAD -- . 2>/dev/null || true
 
-          Categorias incluidas: malware, phishing, cryptojacking, dangerous_material, violence, hacking, mixed_adult, gambling, dating, games, social_networks.
+          # Solo mantener el archivo generado
+          mv blacklist-dns.rsc /tmp/blacklist-dns.rsc
+          git rm -rf . 2>/dev/null || true
+          mv /tmp/blacklist-dns.rsc blacklist-dns.rsc
+          git add blacklist-dns.rsc
 
-          Fuente: https://github.com/olbat/ut1-blacklists" \
-            --latest
+          git commit -m "Blacklist DNS - $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push origin blacklist --force

@@ -7,14 +7,14 @@ GitHub Actions (cron diario 03:00 UTC / 00:00 ARG)
     |
     |  1. Ejecuta generate-blacklist.py
     |  2. Descarga las listas de ut1-blacklists
-    |  3. Genera blacklist-dns.rsc (~100k dominios)
-    |  4. Lo publica como GitHub Release (tag: latest-blacklist)
+    |  3. Genera blacklist-dns.rsc (~500k dominios)
+    |  4. Lo publica en la rama "blacklist" (force push, sin historial)
     |
     v
-GitHub Releases
+Rama "blacklist" en GitHub
     |
-    |  URL fija:
-    |  https://github.com/MateMar04/Red-ITSV/releases/download/latest-blacklist/blacklist-dns.rsc
+    |  URL directa (sin redirecciones):
+    |  https://raw.githubusercontent.com/MateMar04/Red-ITSV/blacklist/blacklist-dns.rsc
     |
     v
 MikroTik CCR2004 (scheduler diario 04:00 ARG)
@@ -39,7 +39,7 @@ No se necesita ningun servidor local. Todo queda automatizado entre GitHub y el 
 | `.github/workflows/update-blacklist.yml` | GitHub Actions | Cron diario que genera y publica la blacklist |
 | `Fase1/CCR2004/generate-blacklist.py` | GitHub Actions | Script Python que descarga listas y genera el .rsc |
 | `Fase1/CCR2004/firewall-blacklist-github.rsc` | MikroTik (una vez) | Configura firewall, DNS, script y scheduler |
-| `blacklist-dns.rsc` | GitHub Release | Archivo generado que el MikroTik descarga diariamente |
+| `blacklist-dns.rsc` | Rama `blacklist` | Archivo generado que el MikroTik descarga diariamente |
 
 ---
 
@@ -67,28 +67,27 @@ git push origin master
 3. Click en **"Run workflow"** → **"Run workflow"**
 4. Esperar a que termine (tarda 2-3 minutos)
 
-### 2.2 Verificar la Release
+### 2.2 Verificar la rama blacklist
 
-1. Ir a **https://github.com/MateMar04/Red-ITSV/releases**
-2. Deberia aparecer una release llamada **"Blacklist DNS - YYYY-MM-DD"**
-3. Deberia tener el archivo **blacklist-dns.rsc** como asset adjunto
+1. Ir a **https://github.com/MateMar04/Red-ITSV/tree/blacklist**
+2. Deberia existir la rama con un unico archivo **blacklist-dns.rsc**
 
 ### 2.3 Verificar la URL de descarga
 
-La URL fija del archivo es:
+La URL directa del archivo es:
 
 ```
-https://github.com/MateMar04/Red-ITSV/releases/download/latest-blacklist/blacklist-dns.rsc
+https://raw.githubusercontent.com/MateMar04/Red-ITSV/blacklist/blacklist-dns.rsc
 ```
 
 Se puede probar descargandolo:
 
 ```bash
-curl -L -o /tmp/test.rsc "https://github.com/MateMar04/Red-ITSV/releases/download/latest-blacklist/blacklist-dns.rsc"
+curl -o /tmp/test.rsc "https://raw.githubusercontent.com/MateMar04/Red-ITSV/blacklist/blacklist-dns.rsc"
 head -15 /tmp/test.rsc
 ```
 
-> **Nota:** GitHub redirige las descargas de releases a `objects.githubusercontent.com`. El flag `-L` (follow redirects) es necesario en curl. En MikroTik, `/tool fetch` sigue redirecciones automaticamente.
+> **Nota:** Se usa `raw.githubusercontent.com` porque es una URL directa sin redirecciones, lo que evita problemas con `/tool fetch` de MikroTik.
 
 ---
 
@@ -250,9 +249,9 @@ Desde el MikroTik:
    /tool fetch url="https://www.google.com" mode=https check-certificate=no dst-path=test.html
    ```
 
-2. Verificar que la release existe:
+2. Verificar que el archivo existe en GitHub:
    ```
-   /tool fetch url="https://github.com/MateMar04/Red-ITSV/releases/download/latest-blacklist/blacklist-dns.rsc" mode=https check-certificate=no dst-path=test.rsc
+   /tool fetch url="https://raw.githubusercontent.com/MateMar04/Red-ITSV/blacklist/blacklist-dns.rsc" mode=https check-certificate=no dst-path=test.rsc
    ```
 
 3. Si falla con error de SSL/TLS, verificar que RouterOS esta actualizado:
@@ -302,6 +301,6 @@ Verificar uso actual:
 | Repositorio | https://github.com/MateMar04/Red-ITSV |
 | GitHub Actions | https://github.com/MateMar04/Red-ITSV/actions |
 | Releases | https://github.com/MateMar04/Red-ITSV/releases |
-| Descarga directa del .rsc | https://github.com/MateMar04/Red-ITSV/releases/download/latest-blacklist/blacklist-dns.rsc |
+| Descarga directa del .rsc | https://raw.githubusercontent.com/MateMar04/Red-ITSV/blacklist/blacklist-dns.rsc |
 | Fuente de las listas | https://github.com/olbat/ut1-blacklists |
 | CleanBrowsing | https://cleanbrowsing.org/filters/ |
