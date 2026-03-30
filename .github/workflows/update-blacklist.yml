@@ -22,7 +22,7 @@ jobs:
           python-version: "3.12"
 
       - name: Generar blacklist
-        run: python3 Fase1/CCR2004/generate-blacklist.py --output blacklist-dns.rsc
+        run: python3 Fase1/CCR2004/generate-blacklist.py --max-domains 500000 --output blacklist-dns.rsc
 
       - name: Subir blacklist como Release
         env:
