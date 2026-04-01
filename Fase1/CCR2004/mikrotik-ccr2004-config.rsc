@@ -60,6 +60,24 @@
 /queue simple add name=QoS_WIFI parent=QoS_TOTAL target=192.168.0.7/32 limit-at=20M/20M max-limit=20M/20M priority=3/3 queue=default/default comment="Wifi Mikrotik (Clase WIFI)"
 /queue simple add name=QoS_DEFAULT parent=QoS_TOTAL target=192.168.0.0/24 limit-at=20M/20M max-limit=20M/20M priority=3/3 queue=default/default comment="Trafico no clasificado (Clase DEFAULT)"
 
+# === VPN WireGuard para administracion remota ===
+/interface wireguard add listen-port=13231 name=wg-admin comment="VPN Admin remota"
+/ip address add address=10.10.10.1/24 interface=wg-admin comment="VPN Admin"
+
+# Agregar peer (reemplazar PublicKey con la clave publica del cliente)
+# Para generar claves en el cliente: wg genkey | tee privatekey | wg pubkey > publickey
+/interface wireguard peers add interface=wg-admin \
+    public-key="FQZvTz/YO3mmgXLeH8hwmCwLhxdeOY5qVhhdHRHTHww=" \
+    allowed-address=10.10.10.2/32 \
+    comment="Admin remoto - Mateo"
+
+# Agregar interfaz VPN a la lista LAN para acceso a gestion
+/interface list member add interface=wg-admin list=LAN comment="VPN Admin"
+
+# Permitir trafico WireGuard entrante desde WAN
+/ip firewall filter add chain=input action=accept protocol=udp dst-port=13231 in-interface-list=WAN \
+    comment="Permitir WireGuard VPN" place-before=[find where comment="Bloqueo de acceso directo desde WAN"]
+
 /ip service set [find name=telnet] disabled=yes
 /ip service set [find name=ftp] disabled=yes
 /ip service set [find name=www] disabled=yes
