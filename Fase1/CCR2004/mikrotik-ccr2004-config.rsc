@@ -84,6 +84,6 @@
 /ip service set [find name=www-ssl] disabled=yes
 /ip service set [find name=api] disabled=yes
 /ip service set [find name=api-ssl] disabled=yes
-/ip service set [find name=winbox] address=192.168.0.0/24
+/ip service set [find name=winbox] address=192.168.0.0/24,10.10.10.0/24
 
 /system note set show-at-login=yes note="CCR2004-16G-2S+"
