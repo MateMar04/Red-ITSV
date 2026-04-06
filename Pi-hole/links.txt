@@ -1,0 +1,14 @@
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/adult/domains.gz
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/bitcoin/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/cryptojacking/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/dangerous_material/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/dating/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/ddos/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/drogue/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/gambling/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/games/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/hacking/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/malware/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/phishing/domains
+https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/stalkerware/domains
+
