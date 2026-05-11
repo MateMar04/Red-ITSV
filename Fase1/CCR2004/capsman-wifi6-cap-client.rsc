@@ -6,7 +6,7 @@
 # - identity: cap-ax-01, cap-ax-02, etc.
 # - caps-man-addresses si el CCR2004 no usa 192.168.0.1.
 
-/system identity set name="cap-ax-01"
+/system identity set name="cap-ax-01-01"
 /system clock set time-zone-name=America/Buenos_Aires
 
 /interface bridge add name=bridgeLocal protocol-mode=rstp comment="Bridge local del CAP"
@@ -23,4 +23,4 @@
 /interface wifi set [find default-name=wifi1] configuration.manager=capsman datapath=capdp disabled=no
 /interface wifi set [find default-name=wifi2] configuration.manager=capsman datapath=capdp disabled=no
 
-/interface wifi cap set enabled=yes discovery-interfaces=bridgeLocal caps-man-addresses=192.168.0.1 slaves-datapath=capdp lock-to-caps-man=yes
+/interface wifi cap set enabled=yes discovery-interfaces=bridgeLocal caps-man-addresses=192.168.0.1 slaves-datapath=capdp

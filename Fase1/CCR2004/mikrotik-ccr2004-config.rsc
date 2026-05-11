@@ -100,8 +100,8 @@
 /interface wifi capsman set enabled=yes interfaces=bridge-lan ca-certificate=auto require-peer-certificate=no
 
 # Futuro captive portal:
-# - La red ya queda separada en vlan-wifi-invitados.
-# - Crear HotSpot sobre vlan-wifi-invitados, no sobre bridge-lan.
+# - La red ya queda separada en vlan-wifi
+# - Crear HotSpot sobre vlan-wifi, no sobre bridge-lan.
 # - Antes de activar captive, revisar DNS, certificados HTTPS y walled garden.
 
 # === VPN WireGuard para administracion remota ===

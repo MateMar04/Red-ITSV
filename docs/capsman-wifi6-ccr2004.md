@@ -26,7 +26,7 @@ Esta guia implementa CAPsMAN moderno de RouterOS v7 en la CCR2004 para administr
 
 ## Archivos
 
-- `Fase1/CCR2004/capsman-wifi6-ccr2004.rsc`: configura VLAN, DHCP, firewall, QoS y CAPsMAN en la CCR2004.
+- `Fase1/CCR2004/mikrotik-ccr2004-config.rsc`: configuracion completa de la CCR2004, incluyendo VLAN WiFi, DHCP, firewall, QoS y CAPsMAN.
 - `Fase1/CCR2004/capsman-wifi6-cap-client.rsc`: deja cada hAP ax3/cAP ax como cliente CAP administrado por la CCR2004.
 
 ## Requisitos
@@ -45,7 +45,7 @@ Esta guia implementa CAPsMAN moderno de RouterOS v7 en la CCR2004 para administr
 
 ## Paso 1 - Preparar el script de la CCR2004
 
-Editar `Fase1/CCR2004/capsman-wifi6-ccr2004.rsc` antes de importarlo:
+Editar `Fase1/CCR2004/mikrotik-ccr2004-config.rsc` antes de importarlo:
 
 - Cambiar `passphrase="CAMBIARME-WIFI-2026"`.
 - Ajustar `ssid="ITSV-WIFI"` si se desea otro nombre.
@@ -58,8 +58,10 @@ Editar `Fase1/CCR2004/capsman-wifi6-ccr2004.rsc` antes de importarlo:
 Importar en la CCR2004:
 
 ```routeros
-/import file-name=capsman-wifi6-ccr2004.rsc
+/import file-name=mikrotik-ccr2004-config.rsc
 ```
+
+Si la CCR2004 ya tiene parte de esta configuracion aplicada, no importar el archivo completo sin revisar duplicados. En ese caso, hacer backup y aplicar solo el bloque CAPsMAN integrado en el script principal.
 
 Verificar:
 
@@ -83,6 +85,8 @@ Subir `Fase1/CCR2004/capsman-wifi6-cap-client.rsc`, editar `identity` y luego im
 ```routeros
 /import file-name=capsman-wifi6-cap-client.rsc
 ```
+
+El script no usa `lock-to-caps-man=yes`, porque ese modo requiere certificados entre el CAP y CAPsMAN. Para este piloto se fija `caps-man-addresses=192.168.0.1` y se deja `require-peer-certificate=no` en la CCR2004.
 
 Verificar en el AP:
 
