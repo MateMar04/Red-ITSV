@@ -15,7 +15,7 @@ Esta guia implementa CAPsMAN moderno de RouterOS v7 en la CCR2004 para administr
 | --- | --- | --- |
 | Bridge LAN existente | `bridge-lan` | Se reutiliza la configuracion base de la CCR2004. |
 | VLAN WiFi | `50` | Red separada para clientes WiFi. |
-| Interfaz L3 | `vlan-wifi-invitados` | Gateway, DHCP, firewall y futuro HotSpot. |
+| Interfaz L3 | `vlan-wifi` | Gateway, DHCP, firewall y futuro HotSpot. |
 | Subred WiFi | `10.50.0.0/24` | Ajustable antes de importar. |
 | Gateway WiFi | `10.50.0.1` | IP de la CCR2004 en la VLAN 50. |
 | SSID | `ITSV-WIFI` | Mismo SSID en 2.4 GHz y 5 GHz. |
@@ -34,14 +34,14 @@ Esta guia implementa CAPsMAN moderno de RouterOS v7 en la CCR2004 para administr
 1. CCR2004 con RouterOS v7 y menu `/interface wifi` disponible.
 2. APs WiFi 6 con RouterOS v7 y paquete `wifi-qcom`.
 3. Los APs deben tener conectividad L2/L3 hacia `192.168.0.1` por la LAN de gestion.
-4. Los switches entre CCR2004 y APs deben transportar VLAN 50.
+4. Los switches entre CCR2004 y APs deben transportar VLAN 50 tagged.
 5. Hacer backup antes de aplicar:
    ```routeros
    /export file=backup-antes-capsman
    /system backup save name=backup-antes-capsman
    ```
 
-> Nota: este diseno no activa `vlan-filtering=yes` en `bridge-lan` para evitar cortar la LAN actual durante el piloto. Para produccion, conviene planificar VLAN filtering y marcar explicitamente puertos trunk/access.
+> Nota: el script principal declara `vlan-filtering=yes` en `bridge-lan` y asume `ether10` como trunk hacia el CRS112. Antes de aplicarlo, confirmar el puerto fisico real y ajustar la lista `tagged` de VLAN 50 si otros enlaces tambien transportan APs o switches.
 
 ## Paso 1 - Preparar el script de la CCR2004
 
@@ -68,7 +68,7 @@ Verificar:
 ```routeros
 /interface wifi capsman print
 /interface wifi provisioning print
-/ip dhcp-server print where name=dhcp-wifi-invitados
+/ip dhcp-server print where name=dhcp-wifi
 /queue simple print where name=QoS_WIFI_CAPSMAN
 ```
 
@@ -101,7 +101,7 @@ Verificar en la CCR2004:
 ```routeros
 /interface wifi capsman remote-cap print
 /interface wifi registration-table print
-/ip dhcp-server lease print where server=dhcp-wifi-invitados
+/ip dhcp-server lease print where server=dhcp-wifi
 ```
 
 ## Roaming entre APs
@@ -124,13 +124,13 @@ El script crea reglas para:
 - Aislar clientes WiFi entre si mediante `client-isolation=yes`.
 - Permitir salida desde WiFi hacia Internet mediante la WAN.
 
-No agregar `vlan-wifi-invitados` a la interface-list `LAN`, porque la regla existente de gestion desde LAN permitiria administrar el router desde clientes WiFi.
+No agregar `vlan-wifi` a la interface-list `LAN`, porque la regla existente de gestion desde LAN permitiria administrar el router desde clientes WiFi.
 
 ## Futuro captive portal
 
 La VLAN 50 queda lista para HotSpot/captive portal. Cuando se implemente:
 
-1. Crear el HotSpot sobre `vlan-wifi-invitados`, no sobre `bridge-lan`.
+1. Crear el HotSpot sobre `vlan-wifi`, no sobre `bridge-lan`.
 2. Definir DNS name y certificado si se usara HTTPS.
 3. Crear walled garden para servicios permitidos antes del login.
 4. Revisar si se usara usuario local, vouchers o RADIUS/User Manager.
@@ -140,7 +140,7 @@ Comandos base para una prueba futura, dejarlos deshabilitados hasta validar:
 
 ```routeros
 /ip hotspot profile add name=hsprof-wifi hotspot-address=10.50.0.1 dns-name=wifi.itsv.edu.ar
-/ip hotspot add name=hotspot-wifi interface=vlan-wifi-invitados address-pool=pool-wifi-invitados profile=hsprof-wifi disabled=yes
+/ip hotspot add name=hotspot-wifi interface=vlan-wifi address-pool=pool-wifi profile=hsprof-wifi disabled=yes
 ```
 
 ## Rollback
@@ -149,8 +149,8 @@ Si algo falla:
 
 ```routeros
 /interface wifi capsman set enabled=no
-/ip dhcp-server disable dhcp-wifi-invitados
-/interface vlan disable vlan-wifi-invitados
+/ip dhcp-server disable dhcp-wifi
+/interface vlan disable vlan-wifi
 ```
 
 Para volver completamente al estado anterior, restaurar el backup realizado antes de la implementacion.

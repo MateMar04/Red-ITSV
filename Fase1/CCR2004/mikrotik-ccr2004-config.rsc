@@ -6,19 +6,25 @@
 /system clock set time-zone-name=America/Buenos_Aires
 /system ntp client set enabled=yes mode=unicast
 
-/interface bridge add name=bridge-lan comment="LAN Principal" protocol-mode=rstp
+/interface bridge add name=bridge-lan comment="LAN Principal" protocol-mode=rstp pvid=1 vlan-filtering=no
 
-/interface bridge port add bridge=bridge-lan interface=ether2
-/interface bridge port add bridge=bridge-lan interface=ether3
-/interface bridge port add bridge=bridge-lan interface=ether4
-/interface bridge port add bridge=bridge-lan interface=ether5
-/interface bridge port add bridge=bridge-lan interface=ether6
-/interface bridge port add bridge=bridge-lan interface=ether7
-/interface bridge port add bridge=bridge-lan interface=ether8
-/interface bridge port add bridge=bridge-lan interface=ether9
-/interface bridge port add bridge=bridge-lan interface=ether10
-/interface bridge port add bridge=bridge-lan interface=ether11
-/interface bridge port add bridge=bridge-lan interface=ether12
+/interface bridge port add bridge=bridge-lan interface=ether2 pvid=1 ingress-filtering=yes frame-types=admit-all
+/interface bridge port add bridge=bridge-lan interface=ether3 pvid=1 ingress-filtering=yes frame-types=admit-all
+/interface bridge port add bridge=bridge-lan interface=ether4 pvid=1 ingress-filtering=yes frame-types=admit-all
+/interface bridge port add bridge=bridge-lan interface=ether5 pvid=1 ingress-filtering=yes frame-types=admit-all
+/interface bridge port add bridge=bridge-lan interface=ether6 pvid=1 ingress-filtering=yes frame-types=admit-all
+/interface bridge port add bridge=bridge-lan interface=ether7 pvid=1 ingress-filtering=yes frame-types=admit-all
+/interface bridge port add bridge=bridge-lan interface=ether8 pvid=1 ingress-filtering=yes frame-types=admit-all
+/interface bridge port add bridge=bridge-lan interface=ether9 pvid=1 ingress-filtering=yes frame-types=admit-all
+/interface bridge port add bridge=bridge-lan interface=ether10 comment="Trunk CRS112 - LAN sin etiqueta + VLAN 50 tagged" pvid=1 ingress-filtering=yes frame-types=admit-all
+/interface bridge port add bridge=bridge-lan interface=ether11 pvid=1 ingress-filtering=yes frame-types=admit-all
+/interface bridge port add bridge=bridge-lan interface=ether12 pvid=1 ingress-filtering=yes frame-types=admit-all
+
+# VLAN 50 RED-ITSV/WiFi.
+# Ajustar "ether10" si el uplink al CRS112 esta conectado a otro puerto del CCR2004.
+# Agregar otros puertos a tagged si tambien llevan switches/APs con VLAN 50.
+/interface bridge vlan add bridge=bridge-lan vlan-ids=1 untagged=bridge-lan,ether2,ether3,ether4,ether5,ether6,ether7,ether8,ether9,ether10,ether11,ether12 comment="LAN gestion sin etiqueta"
+/interface bridge vlan add bridge=bridge-lan vlan-ids=50 tagged=bridge-lan,ether10 comment="VLAN 50 RED-ITSV/WiFi tagged hacia CRS112"
 
 /interface list add name=WAN comment="Enlace saliente"
 /interface list add name=LAN comment="Redes internas"
@@ -36,6 +42,8 @@
 /ip pool add name=pool-wifi ranges=10.50.0.50-10.50.0.250
 /ip dhcp-server add name=dhcp-wifi interface=vlan-wifi address-pool=pool-wifi lease-time=4h disabled=no
 /ip dhcp-server network add address=10.50.0.0/24 gateway=10.50.0.1 dns-server=10.50.0.1 domain=wifi.itsv.edu.ar comment="DHCP WiFi CAPsMAN"
+
+/interface bridge set [find name=bridge-lan] vlan-filtering=yes
 
 /ip route add dst-address=0.0.0.0/0 gateway=181.10.31.113 distance=1 comment="Default route"
 
