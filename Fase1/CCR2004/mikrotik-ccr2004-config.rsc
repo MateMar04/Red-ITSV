@@ -122,6 +122,30 @@
 /ip firewall filter add chain=input action=accept protocol=udp dst-port=13231 in-interface-list=WAN \
     comment="Permitir WireGuard VPN" place-before=[find where comment="Bloqueo de acceso directo desde WAN"]
 
+# === VPN WireGuard para alumnos - gestion limitada de Ubuntu ===
+# Esta VPN no se agrega a interface-list=LAN para evitar gestion del CCR2004.
+# Los alumnos solo pueden acceder por SSH al servidor Ubuntu 192.168.0.100.
+/interface wireguard add listen-port=13232 name=wg-alumnos comment="VPN alumnos - acceso SSH Ubuntu"
+/ip address add address=10.10.20.1/24 interface=wg-alumnos comment="VPN alumnos"
+
+# Agregar peers cuando cada alumno entregue su clave publica.
+# Ejemplo alumno 1:
+# /interface wireguard peers add interface=wg-alumnos public-key="<PUBLIC_KEY_ALUMNO_1>" allowed-address=10.10.20.2/32 comment="Alumno 1 - SSH Ubuntu"
+# Ejemplo alumno 2:
+# /interface wireguard peers add interface=wg-alumnos public-key="<PUBLIC_KEY_ALUMNO_2>" allowed-address=10.10.20.3/32 comment="Alumno 2 - SSH Ubuntu"
+
+# Permitir trafico WireGuard de alumnos desde WAN.
+/ip firewall filter add chain=input action=accept protocol=udp dst-port=13232 in-interface-list=WAN \
+    comment="Permitir WireGuard alumnos" place-before=[find where comment="Bloqueo de acceso directo desde WAN"]
+
+# Bloquear gestion del CCR2004 desde la VPN de alumnos, permitiendo solo diagnostico ICMP.
+/ip firewall filter add chain=input action=accept in-interface=wg-alumnos protocol=icmp comment="VPN alumnos permite ping al CCR2004"
+/ip firewall filter add chain=input action=drop in-interface=wg-alumnos comment="VPN alumnos bloquea gestion del CCR2004"
+
+# Permisos de la VPN de alumnos hacia la LAN: solo SSH al servidor Ubuntu.
+/ip firewall filter add chain=forward action=accept in-interface=wg-alumnos dst-address=192.168.0.100 protocol=tcp dst-port=22 comment="VPN alumnos permite SSH a Ubuntu"
+/ip firewall filter add chain=forward action=drop in-interface=wg-alumnos comment="VPN alumnos bloquea otros destinos"
+
 /ip service set [find name=telnet] disabled=yes
 /ip service set [find name=ftp] disabled=yes
 /ip service set [find name=www] disabled=yes
